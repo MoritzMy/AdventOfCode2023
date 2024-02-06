@@ -21,7 +21,10 @@ namespace AdventOfCode
             Console.WriteLine("\nDay 3 Solutions:");
             Day3 day3 = new Day3();
             day3.Day3Solutions();
-            
+
+            Console.WriteLine("\nDay 4 Solutions:");
+            Day4 day4 = new Day4();
+            day4.Day4Solutions();
         }
 
         
