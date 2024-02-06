@@ -18,8 +18,8 @@ namespace AdventOfCode
             StreamReader sr = new StreamReader("C:\\Users\\PC\\source\\repos\\AdventOfCode\\Day3Puzzle.txt");
             int sum = 0;
             int lineCounter = 0;
-            int sumOfGearRatio = 0;
             int GearRatioSum = 0;
+
             List<(int num, int starPosition)> starPosition = new List<(int, int)>();
             while (!sr.EndOfStream)
             {
@@ -29,8 +29,6 @@ namespace AdventOfCode
                 sum += GetNumsFromLine(aboveLine, currentLine, nextLine, lineCounter, starPosition);
                 lineCounter++;
                 
-                Console.WriteLine(sumOfGearRatio);
-                Console.WriteLine(GearRatioSum);
 
             }
             sr.Close();
@@ -92,12 +90,10 @@ namespace AdventOfCode
             int sumOfGearRatio = 0;
             for (int i = 0; i < starPosition.Count - 1; i++)
             {
-                Console.WriteLine(starPosition[i].num + ", " + starPosition[i].starPosition);
                 for (int j = i + 1; j < starPosition.Count; j++)
                 {
                     if (starPosition[i].starPosition == starPosition[j].starPosition)
                     {
-                        Console.WriteLine("happens uwu");
                         sumOfGearRatio += starPosition[j].num * starPosition[i].num;
                     }
                 }
