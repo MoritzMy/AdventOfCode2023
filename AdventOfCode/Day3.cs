@@ -20,32 +20,34 @@ namespace AdventOfCode
             int lineCounter = 0;
             int sumOfGearRatio = 0;
             int GearRatioSum = 0;
+            List<(int num, int starPosition)> starPosition = new List<(int, int)>();
             while (!sr.EndOfStream)
             {
                 aboveLine = currentLine;
                 currentLine = nextLine;
                 nextLine = "." + sr.ReadLine() + ".";
-                sum += GetNumsFromLine(aboveLine, currentLine, nextLine, lineCounter, out sumOfGearRatio);
+                sum += GetNumsFromLine(aboveLine, currentLine, nextLine, lineCounter, starPosition);
                 lineCounter++;
-                GearRatioSum += sumOfGearRatio;
+                
+                Console.WriteLine(sumOfGearRatio);
+                Console.WriteLine(GearRatioSum);
 
             }
             sr.Close();
             aboveLine = currentLine;
             currentLine = nextLine;
             nextLine = placeHolder;
-            sum += GetNumsFromLine(aboveLine, currentLine, nextLine, lineCounter, out int sumOfGearRatio2);
-            GearRatioSum += sumOfGearRatio2;
+            sum += GetNumsFromLine(aboveLine, currentLine, nextLine, lineCounter, starPosition);
+            GearRatioSum = ReturnGearSum(starPosition);
 
             Console.WriteLine(sum);
             Console.WriteLine(GearRatioSum);
 
         } 
-        public int GetNumsFromLine(string aboveLine, string currentLine, string nextLine, int lineCounter, out int sumOfGearRatio)
+        public int GetNumsFromLine(string aboveLine, string currentLine, string nextLine, int lineCounter, List<(int num, int starPosition)> starPosition)
         {
             string currentNum = "";
             int linesum = 0;
-            List<(int num, int starPostion)> starPosition = new List<(int, int)>();
 
             for (int i = 0; i < currentLine.Length; i++)
             {
@@ -53,7 +55,7 @@ namespace AdventOfCode
                 {
                     currentNum += currentLine[i];
                 }
-                else if ((!char.IsDigit(currentLine[i]) && currentNum != "") || (currentNum != "" && i == currentLine.Length - 1))
+                else if (!char.IsDigit(currentLine[i]) && currentNum != "")
                 {
                     int currentIndex = i - currentNum.Length;
                     for (int j = currentIndex - 1; j <= currentIndex + currentNum.Length; j++)
@@ -82,20 +84,25 @@ namespace AdventOfCode
                 }
                 else currentNum = "";
             }
-            sumOfGearRatio = 0;
+            
+            return linesum;
+        }
+        static int ReturnGearSum(List<(int num, int starPosition)> starPosition)
+        {
+            int sumOfGearRatio = 0;
             for (int i = 0; i < starPosition.Count - 1; i++)
             {
-                Console.WriteLine(starPosition[i].num + ", " + starPosition[i].starPostion);
+                Console.WriteLine(starPosition[i].num + ", " + starPosition[i].starPosition);
                 for (int j = i + 1; j < starPosition.Count; j++)
                 {
-                    if (starPosition[i].starPostion == starPosition[j].starPostion)
+                    if (starPosition[i].starPosition == starPosition[j].starPosition)
                     {
                         Console.WriteLine("happens uwu");
                         sumOfGearRatio += starPosition[j].num * starPosition[i].num;
                     }
                 }
             }
-            return linesum;
+            return sumOfGearRatio;
         }
     }
 }
