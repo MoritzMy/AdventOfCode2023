@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdventOfCode_2023;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,10 @@ namespace AdventOfCode
             Console.WriteLine("\nDay 4 Solutions:");
             Day4 day4 = new Day4();
             day4.Day4Solutions();
+
+            Console.WriteLine("\nDay 5 Solutions:");
+            Day5 day5 = new Day5();
+            day5.Day5Solutions();
         }
 
         
