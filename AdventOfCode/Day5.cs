@@ -6,6 +6,8 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
+using System.ComponentModel;
+using System.Diagnostics.Metrics;
 using System.Transactions;
 
 namespace adventofcode_2023
@@ -19,13 +21,16 @@ namespace adventofcode_2023
             sr.Close();
             string[] lines = text.Split("\n");
             string[] seedsString = lines[0].Split(": ")[1].Split(" ");
-            uint[] seeds = new uint[seedsString.Length];
+            long[] seeds = new long[seedsString.Length];
             for (int i = 0; i < seedsString.Length; i++)
             {
-                seeds[i] = Convert.ToUInt32(seedsString[i]);
+                seeds[i] = Convert.ToInt64(seedsString[i]);
             }
+            long[] seedsCopy = new long[seeds.Length];
+            seeds.CopyTo(seedsCopy, 0);
 
-            List<List<((uint destination, uint source) start, uint range)>> MapsList = ReturnTupleList(lines);
+
+            List<List<((long destination, long source) start, long range)>> MapsList = ReturnTupleList(lines);
             text = "";
             for (int j = 0; j < seeds.Length; j++)
             {
@@ -43,76 +48,78 @@ namespace adventofcode_2023
                 }
             }
             Console.WriteLine(FindLowestSeed(seeds));
-            uint[] seedsCopy = seeds;
+
+            // part 2
             bool isRange = false;
-            uint[] seedsValue = new uint[seeds.Length / 2];
-            uint[] seedsRange = new uint[seeds.Length / 2];
+            long[] seedsValue = new long[seedsCopy.Length / 2];
+            long[] seedsRange = new long[seedsCopy.Length / 2];
             for(int i = 0; i < seeds.Length; i++)
             {
                 if (isRange)
                 {
-                    seedsRange[((i - 1) / 2)] = seeds[i];
+                    seedsRange[((i - 1) / 2)] = seedsCopy[i];
                     isRange = false;
                 }
                 else
                 {
-                    seedsValue[i / 2] = seeds[i];
+                    seedsValue[i / 2] = seedsCopy[i];
                     isRange = true;
                 }
             }
-
-            // part 2
-            List<uint> CurrentSeedList = new List<uint>();
-
-            List<uint> FinishedSeeds = new List<uint>();
-            for (int z = 0; z < seedsValue.Length; z ++)
+            bool lowestLocationFound = false;
+            long locationCounter = 0;
+            long tempLocation = locationCounter;
+            while (!lowestLocationFound)
             {
-                foreach(uint seed in CurrentSeedList)
-                {                    
-                    FinishedSeeds.Add(seed);
-                    Console.Write(seed + " ");
-                }
-                CurrentSeedList = new List<uint>();
-                for (int j = 0; j < seedsRange[z]; j++)
+                tempLocation = locationCounter;
+                for (int i = MapsList.Count - 1; i >= 0; i--)
                 {
-                    CurrentSeedList.Add(seedsValue[z] + Convert.ToUInt32(j));
-                    for (int i = 0; i < MapsList.Count; i++)
+                    for (int j = 0; j < MapsList[i].Count; j++)
                     {
-                        for (int p = 0; p < MapsList[i].Count; p++)
+                        if(tempLocation >= MapsList[i][j].start.destination && tempLocation < MapsList[i][j].start.destination + MapsList[i][j].range)
                         {
-                            if (CurrentSeedList[j] >= MapsList[i][p].start.source && CurrentSeedList[j] < MapsList[i][p].start.source + MapsList[i][p].range)
-                            {
-                                CurrentSeedList[j] = MapsList[i][p].start.destination + (CurrentSeedList[j] - MapsList[i][p].start.source);
-                                break;
-                            }
+                            tempLocation = MapsList[i][j].start.source + (tempLocation - MapsList[i][j].start.destination);
+                            break;
                         }
-
                     }
-                    Console.Write(".");
                 }
+                for (int k = 0; k < seedsValue.Length; k++)
+                {
+                    if (tempLocation >= seedsValue[k] && tempLocation < seedsValue[k] + seedsRange[k])
+                    {
+                        Console.Write($"{locationCounter}, ");
+                        Console.WriteLine(tempLocation);
+                        lowestLocationFound = true;
+                    }
+                }
+                Console.Write($"{locationCounter}, ");
+
+                locationCounter++;
             }
-            Console.WriteLine(FindLowestSeed(FinishedSeeds.ToArray()));
+
+
+            
         }
 
-        public List<((uint, uint), uint)> GetMap(List<string> list)
+        public List<((long, long), long)> GetMap(List<string> list)
         {
-            List<((uint destination, uint source) start, uint range)> Map = new List<((uint, uint), uint)>();
+            List<((long destination, long source) start, long range)> Map = new List<((long, long), long)>();
             foreach (string item in list)
             {
                 string[] values = item.Split(" ");
-                uint destinationStart = Convert.ToUInt32(values[0]);
-                uint sourceStart = Convert.ToUInt32(values[1]);
-                uint range = Convert.ToUInt32(values[2]);
+                long destinationStart = Convert.ToInt64(values[0]);
+                long sourceStart = Convert.ToInt64(values[1]);
+                long range = Convert.ToInt64(values[2]);
                 Map.Add(((destinationStart, sourceStart), range));
 
             }
             return Map;
 
         }
-        public List<List<((uint, uint), uint)>> ReturnTupleList(string[] lines)
+        public List<List<((long, long), long)>> ReturnTupleList(string[] lines)
         {
             List<string> lineList = new List<string>();
-            List<List<((uint destination, uint source) start, uint range)>> MapsList = new List<List<((uint, uint), uint)>>();
+            List<List<((long destination, long source) start, long range)>> MapsList = new List<List<((long, long), long)>>();
 
             foreach (string line in lines)
             {
@@ -136,10 +143,10 @@ namespace adventofcode_2023
             }
             return MapsList;
         }
-        public uint FindLowestSeed(uint[] seeds)
+        public long FindLowestSeed(long[] seeds)
         {
-            uint lowestseed = seeds[0];
-            foreach (uint seed in seeds)
+            long lowestseed = seeds[0];
+            foreach (long seed in seeds)
             {
                 if (seed < lowestseed)
                 {
@@ -147,6 +154,18 @@ namespace adventofcode_2023
                 }
             }
             return lowestseed;
+        }
+        public long FindHighestSeed(long[] seeds)
+        {
+            long highestseed = seeds[0];
+            foreach (long seed in seeds)
+            { 
+                if (seed < highestseed)
+                {
+                    highestseed = seed;
+                } 
+            }
+            return highestseed;
         }
     }
 }
@@ -159,14 +178,14 @@ namespace adventofcode_2023
 
 //            string[] lines = text.Split('\n');
 //            string[] seedsString = (lines[0].Split(": ")[1]).Split(" ");
-//            uint[] seeds = new uint[seedsString.Length];
+//            long[] seeds = new long[seedsString.Length];
 
 //            for(int i = 0; i < seedsString.Length; i++)
 //            {
-//                seeds[i] = Convert.ToUInt32(seedsString[i]);
+//                seeds[i] = Convert.ToInt64(seedsString[i]);
 //            }
 
-//            List<Dictionary<uint, uint>> MapsList = ReturnMapList(lines);
+//            List<Dictionary<long, long>> MapsList = ReturnMapList(lines);
 //            text = "";
 
 //            for(int j = 0; j < seeds.Length; j++) 
@@ -177,24 +196,24 @@ namespace adventofcode_2023
 //                    if (MapsList[i].ContainsKey(seeds[j])) 
 //                    {
 
-//                        MapsList[i].TryGetValue(seeds[j], out uint mappedValue);
+//                        MapsList[i].TryGetValue(seeds[j], out long mappedValue);
 //                        seeds[j] = mappedValue;
 //                    }
 
 //                }
 //                Console.Write("\n");
 //            }
-//            foreach (uint seed in seeds)
+//            foreach (long seed in seeds)
 //            {
 //                Console.Write(seed + " ");
 //            }
 //            Console.WriteLine(FindLowestSeed(seeds));
 
 //        }
-//        public List<Dictionary<uint, uint>> ReturnMapList(string[] lines)
+//        public List<Dictionary<long, long>> ReturnMapList(string[] lines)
 //        {
 //            List<string> lineList = new List<string>();
-//            List<Dictionary<uint, uint>> MapsList = new List<Dictionary<uint, uint>>();
+//            List<Dictionary<long, long>> MapsList = new List<Dictionary<long, long>>();
 
 //            foreach (string line in lines)
 //            {
@@ -218,27 +237,27 @@ namespace adventofcode_2023
 //            }
 //            return MapsList;
 //        }
-//        public Dictionary<uint, uint> GetMap(List<string> list)
+//        public Dictionary<long, long> GetMap(List<string> list)
 //        {
-//            Dictionary<uint, uint> Map = new Dictionary<uint, uint>();
+//            Dictionary<long, long> Map = new Dictionary<long, long>();
 //            foreach (string item in list)
 //            {
 //                string[] values = item.Split(" ");
-//                uint destinationStart = Convert.ToUInt32(values[0]);
-//                uint sourceStart = Convert.ToUInt32(values[1]);
-//                uint range = Convert.ToUInt32(values[2]);
+//                long destinationStart = Convert.ToInt64(values[0]);
+//                long sourceStart = Convert.ToInt64(values[1]);
+//                long range = Convert.ToInt64(values[2]);
 
-//                for (uint i = 0; i < range; i++)
+//                for (long i = 0; i < range; i++)
 //                {
 //                    Map.Add(sourceStart + i, destinationStart + i);
 //                }
 //            }
 //            return Map;
 //        }
-//        public uint FindLowestSeed(uint[] seeds)
+//        public long FindLowestSeed(long[] seeds)
 //        {
-//            uint lowestSeed = seeds[0];
-//            foreach (uint seed in seeds)
+//            long lowestSeed = seeds[0];
+//            foreach (long seed in seeds)
 //            {
 //                if (seed < lowestSeed)
 //                {
