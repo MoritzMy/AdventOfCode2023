@@ -16,6 +16,8 @@ namespace adventofcode_2023
     {
         public void Day5Solutions()
         {
+            var watch = new System.Diagnostics.Stopwatch();
+
             StreamReader sr = new StreamReader("C:\\Users\\PC\\source\\repos\\AdventOfCode\\Day5Puzzle.txt");
             string text = sr.ReadToEnd();
             sr.Close();
@@ -29,6 +31,7 @@ namespace adventofcode_2023
             long[] seedsCopy = new long[seeds.Length];
             seeds.CopyTo(seedsCopy, 0);
 
+            watch.Start();
 
             List<List<((long destination, long source) start, long range)>> MapsList = ReturnTupleList(lines);
             text = "";
@@ -47,13 +50,14 @@ namespace adventofcode_2023
 
                 }
             }
-            Console.WriteLine(FindLowestSeed(seeds));
+            watch.Stop();
+            Console.WriteLine($"{FindLowestSeed(seeds)} Calculated in {watch.ElapsedMilliseconds} ms");
 
             // part 2
             bool isRange = false;
             long[] seedsValue = new long[seedsCopy.Length / 2];
             long[] seedsRange = new long[seedsCopy.Length / 2];
-            for(int i = 0; i < seeds.Length; i++)
+            for (int i = 0; i < seeds.Length; i++)
             {
                 if (isRange)
                 {
@@ -69,6 +73,11 @@ namespace adventofcode_2023
             bool lowestLocationFound = false;
             long locationCounter = 0;
             long tempLocation = locationCounter;
+            int locationCounterIncrease = 1000000;
+
+
+            watch = System.Diagnostics.Stopwatch.StartNew();
+
             while (!lowestLocationFound)
             {
                 tempLocation = locationCounter;
@@ -76,29 +85,35 @@ namespace adventofcode_2023
                 {
                     for (int j = 0; j < MapsList[i].Count; j++)
                     {
-                        if(tempLocation >= MapsList[i][j].start.destination && tempLocation < MapsList[i][j].start.destination + MapsList[i][j].range)
+                        if (tempLocation >= MapsList[i][j].start.destination && tempLocation < MapsList[i][j].start.destination + MapsList[i][j].range)
                         {
                             tempLocation = MapsList[i][j].start.source + (tempLocation - MapsList[i][j].start.destination);
                             break;
                         }
                     }
                 }
+
                 for (int k = 0; k < seedsValue.Length; k++)
                 {
                     if (tempLocation >= seedsValue[k] && tempLocation < seedsValue[k] + seedsRange[k])
                     {
-                        Console.Write($"{locationCounter}, ");
-                        Console.WriteLine(tempLocation);
-                        lowestLocationFound = true;
+                        if (locationCounterIncrease == 1)
+                        {
+                            Console.Write($"Solution to Part 2: {locationCounter} (Location), {tempLocation} (corresponding Seed) ");
+                            lowestLocationFound = true;
+                            break;
+                        }
+                        else
+                        {
+                            locationCounter -= locationCounterIncrease;
+                            locationCounterIncrease /= 10;
+                        }
                     }
                 }
-                Console.Write($"{locationCounter}, ");
-
-                locationCounter++;
+                locationCounter += locationCounterIncrease;
             }
-
-
-            
+            watch.Stop();
+            Console.Write($"Calculated in {watch.ElapsedMilliseconds} ms");
         }
 
         public List<((long, long), long)> GetMap(List<string> list)
