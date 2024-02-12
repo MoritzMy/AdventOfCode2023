@@ -119,8 +119,8 @@ namespace adventOfCode_2023
                 }
                 else
                 {
-                    if ((time % 2 == 0)) counter++;
-                    return (int)(time - 2 * counter);
+                    if ((time % 2 == 0));
+                    return (int)(time - 2 * counter) + 1;
                 }
             }
             return 0;
