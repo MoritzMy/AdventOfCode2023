@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using adventOfCode_2023;
+using AdventOfCode_2023;
 
 namespace AdventOfCode
 {
@@ -32,9 +33,14 @@ namespace AdventOfCode
             //Day5 day5 = new Day5();
             //day5.Day5Solutions();
 
-            Console.WriteLine("\nDay 6 Solutions:");
-            Day6 day6 = new Day6();
-            day6.Day6Solutions();
+            //Console.WriteLine("\nDay 6 Solutions:");
+            //Day6 day6 = new Day6();
+            //day6.Day6Solutions();
+
+            Console.WriteLine("\nDay 7 Solutions:");
+            Day7 day7 = new Day7();
+            day7.Day7Solutions();
+           
 
         }
 
