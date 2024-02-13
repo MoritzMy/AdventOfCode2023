@@ -16,7 +16,6 @@ namespace AdventOfCode_2023
         string startingState;
         string finishingState;
         string currentState;
-        int arrivedFirstTimeCounter;
         int loopCounter;
 
         public StateLoops(string startingState)
@@ -24,17 +23,15 @@ namespace AdventOfCode_2023
             this.startingState = startingState;
             this.currentState = String.Empty;
             this.finishingState = String.Empty;
-            this.arrivedFirstTimeCounter = 0;
             this.loopCounter = 0;
         }
         public string StartingState { get { return this.startingState; } }
         public string CurrentState { get { return this.currentState; } set { this.currentState = value; } }
         public string FinishingState { get { return this.finishingState; } set { this.finishingState = value; } }
-        public int ArrivedFirstTimeCounter { get { return this.arrivedFirstTimeCounter; } set { this.arrivedFirstTimeCounter = value; } }
         public int LoopCounter { get { return this.loopCounter; } set { this.loopCounter = value; } }
         public override string ToString()
         {
-            return $"{StartingState}: {FinishingState} reached in {arrivedFirstTimeCounter}, looped every {LoopCounter}";
+            return $"{StartingState}: {FinishingState} looped every {LoopCounter} steps";
         }
     }
     internal class Day8
@@ -122,15 +119,11 @@ namespace AdventOfCode_2023
                         if (FinishingStates.Contains(state.CurrentState) && state.FinishingState == String.Empty)
                         {
                             state.FinishingState = state.CurrentState;
-                            state.ArrivedFirstTimeCounter = counter;
-                            counter = 0;
-                        }
-                        else if (FinishingStates.Contains(state.CurrentState) && state.FinishingState == state.CurrentState)
-                        {
                             state.LoopCounter = counter;
                             currentStateFinished = true;
                             break;
                         }
+
 
                         counter++;
                     }
@@ -175,7 +168,7 @@ namespace AdventOfCode_2023
 
         public long LeastCommonMultiple(long num1, long num2)
         {
-            return (long)((num1 / BiggestCommonDenominator(num1, num2)) * num2);
+            return (num1 / BiggestCommonDenominator(num1, num2)) * num2;
         }
     }
 }
