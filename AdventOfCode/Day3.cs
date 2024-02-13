@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -15,10 +16,12 @@ namespace AdventOfCode
             string currentLine = placeHolder;
             string nextLine = placeHolder;
             string aboveLine;
-            StreamReader sr = new StreamReader("C:\\Users\\PC\\source\\repos\\AdventOfCode\\Day3Puzzle.txt");
+            StreamReader sr = new StreamReader("Day3Puzzle.txt");
             int sum = 0;
             int lineCounter = 0;
             int GearRatioSum = 0;
+
+            Stopwatch watch = Stopwatch.StartNew();
 
             List<(int num, int starPosition)> starPosition = new List<(int, int)>();
             while (!sr.EndOfStream)
@@ -36,10 +39,14 @@ namespace AdventOfCode
             currentLine = nextLine;
             nextLine = placeHolder;
             sum += GetNumsFromLine(aboveLine, currentLine, nextLine, lineCounter, starPosition);
-            GearRatioSum = ReturnGearSum(starPosition);
+            watch.Stop();
+            Console.WriteLine($"Part 1: {sum} in {watch.ElapsedMilliseconds} ms");
 
-            Console.WriteLine(sum);
-            Console.WriteLine(GearRatioSum);
+            watch = Stopwatch.StartNew();
+
+            GearRatioSum = ReturnGearSum(starPosition);
+            watch.Stop();
+            Console.WriteLine($"Part 2: {GearRatioSum} in {watch.ElapsedMilliseconds} ms");
 
         } 
         public int GetNumsFromLine(string aboveLine, string currentLine, string nextLine, int lineCounter, List<(int num, int starPosition)> starPosition)

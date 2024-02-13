@@ -18,7 +18,7 @@ namespace adventofcode_2023
         {
             var watch = new System.Diagnostics.Stopwatch();
 
-            StreamReader sr = new StreamReader("C:\\Users\\PC\\source\\repos\\AdventOfCode\\Day5Puzzle.txt");
+            StreamReader sr = new StreamReader("Day5Puzzle.txt");
             string text = sr.ReadToEnd();
             sr.Close();
             string[] lines = text.Split("\n");
@@ -51,7 +51,7 @@ namespace adventofcode_2023
                 }
             }
             watch.Stop();
-            Console.WriteLine($"{FindLowestSeed(seeds)} Calculated in {watch.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Part 1: {FindLowestSeed(seeds)} in {watch.ElapsedMilliseconds} ms");
 
             // part 2
             bool isRange = false;
@@ -99,7 +99,7 @@ namespace adventofcode_2023
                     {
                         if (locationCounterIncrease == 1)
                         {
-                            Console.Write($"Solution to Part 2: {locationCounter} (Location), {tempLocation} (corresponding Seed) ");
+                            Console.Write($"Part 2: {locationCounter} (Location), {tempLocation} (corresponding Seed) ");
                             lowestLocationFound = true;
                             break;
                         }
@@ -113,7 +113,7 @@ namespace adventofcode_2023
                 locationCounter += locationCounterIncrease;
             }
             watch.Stop();
-            Console.Write($"Calculated in {watch.ElapsedMilliseconds} ms");
+            Console.WriteLine($" in {watch.ElapsedMilliseconds} ms");
         }
 
         public List<((long, long), long)> GetMap(List<string> list)

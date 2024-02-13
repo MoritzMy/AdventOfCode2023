@@ -1,15 +1,17 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode
 {
     public class Day1
-    { 
-        public void DayOneSolutions() 
+    {
+        public void DayOneSolutions()
         {
             int sum = 0;
-            StreamReader sr = new StreamReader("C:\\Users\\PC\\source\\repos\\AdventOfCode\\Day1Puzzle.txt");
+            StreamReader sr = new StreamReader("Day1Puzzle.txt");
+            Stopwatch watch = Stopwatch.StartNew();
             while (!sr.EndOfStream)
             {
                 int firstDigit = -1;
@@ -31,7 +33,8 @@ namespace AdventOfCode
                 sum += firstDigit * 10 + lastDigit;
             }
             sr.Close();
-            Console.WriteLine(sum);
+            watch.Stop();
+            Console.WriteLine($"Part 2: {sum} in {watch.ElapsedMilliseconds} ms");
         }
 
         static string ReplaceAllSpelledNums(string line)
@@ -46,6 +49,5 @@ namespace AdventOfCode
 
             return line;
         }
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -14,9 +15,10 @@ namespace AdventOfCode
         {
             int GameCounter = 1;
             int sum = 0;
-            StreamReader sr = new StreamReader("C:\\Users\\PC\\source\\repos\\AdventOfCode\\Day2Puzzle.txt");
+            StreamReader sr = new StreamReader("Day2Puzzle.txt");
             int minDiceSum = 0;
 
+            Stopwatch watch = Stopwatch.StartNew();
 
             while (!sr.EndOfStream)
             {
@@ -43,8 +45,9 @@ namespace AdventOfCode
                 minDiceSum += GetPower(currentGame);
 
             }
-            Console.WriteLine(sum);
-            Console.WriteLine(minDiceSum);
+            watch.Stop();
+            Console.WriteLine($"Part 1: {sum} in {watch.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Part 2: {minDiceSum} in {watch.ElapsedMilliseconds} ms");
 
         }
         static int GetPower(string currentGame)

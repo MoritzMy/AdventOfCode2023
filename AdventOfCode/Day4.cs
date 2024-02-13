@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -12,10 +13,12 @@ namespace AdventOfCode
     {
         public void Day4Solutions() 
         {
-            StreamReader sr = new StreamReader("C:\\Users\\PC\\source\\repos\\AdventOfCode\\Day4Puzzle.txt");
+            StreamReader sr = new StreamReader("Day4Puzzle.txt");
             double scoreSum = 0;
             int counter = 0;
             int[] gameNumbers = Enumerable.Repeat(1, 205).ToArray();
+
+            Stopwatch watch = Stopwatch.StartNew();
 
             while (!sr.EndOfStream)
             {
@@ -36,9 +39,13 @@ namespace AdventOfCode
 
             }
             sr.Close();
-            Console.WriteLine(scoreSum);
+
+            watch.Stop();
+            Console.WriteLine($"Part 1: {scoreSum} in {watch.ElapsedMilliseconds} ms");
+            watch.Restart();
             int sumCards = SumUpAmountOfCards(gameNumbers);
-            Console.WriteLine(sumCards);
+            watch.Stop();
+            Console.WriteLine($"Part 2: {sumCards} in {watch.ElapsedMilliseconds} ms");
         }
         public List<int> GetCards(string cardsString)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
@@ -12,13 +13,18 @@ namespace adventOfCode_2023
     {
         public void Day6Solutions()
         {
-            StreamReader sr = new StreamReader("C:\\Users\\morit\\source\\repos\\AdventOfCode2023\\Day6Puzzle.txt");
+            StreamReader sr = new StreamReader("Day6Puzzle.txt");
             string timeString = RemoveUnnecessaryWhiteSpace(sr.ReadLine().Split(": ")[1]);
             string distanceString = RemoveUnnecessaryWhiteSpace(sr.ReadLine().Split(": ")[1]);
+
             List<long> time = new List<long>();
             List<long> distance = new List<long>();
+
             string[] timeStringArray = timeString.Split(" ");
             string[] distanceStringArray = distanceString.Split(" ");
+
+            Stopwatch watch = Stopwatch.StartNew();
+
             for(long i = 0; i < distanceStringArray.Length; i++)
             {
                 time.Add(long.Parse(timeStringArray[i]));
@@ -44,9 +50,12 @@ namespace adventOfCode_2023
             {
                 sum *= winningTime;
             }
-            Console.WriteLine(sum);
+
+            watch.Stop();
+            Console.WriteLine($"Part 1: {sum} in {watch.ElapsedMilliseconds} ms");
 
             // Part 2
+            watch = Stopwatch.StartNew();
             string ConcatinatedTime = "";
             string ConcatinatedDistance = "";
 
@@ -55,7 +64,7 @@ namespace adventOfCode_2023
                 ConcatinatedTime += timeStringArray[i];
                 ConcatinatedDistance += distanceStringArray[i];
             }
-            long bigTime = Convert.ToInt64(ConcatinatedTime);
+            long bigTime = Convert.ToInt64(ConcatinatedTime); // Finding variable names is hard ok
             long bigDistance = Convert.ToInt64(ConcatinatedDistance);
 
             long[] currentTimes2 = determineDistances(bigTime);
@@ -67,8 +76,9 @@ namespace adventOfCode_2023
                     counter++;
                 }
             }
-            Console.WriteLine(counter);
-            Console.WriteLine(determineWinningTimes(bigTime, bigDistance));
+            int finalWinningTime = determineWinningTimes(bigTime, bigDistance);
+            watch.Stop();
+            Console.WriteLine($"Part 2: {finalWinningTime} in {watch.ElapsedMilliseconds} ms");
 
 
         }
