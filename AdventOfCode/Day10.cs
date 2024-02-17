@@ -1,7 +1,11 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,45 +60,162 @@ namespace AdventOfCode_2023
         public void Day10Solution()
         {
             StreamReader sr = new StreamReader("Day10Puzzle.txt");
-            string[] maze = sr.ReadToEnd().Split('\n');
-            
+            string[] input = sr.ReadToEnd().Split('\n');
+            char[,] maze = new char[input.Length, input[0].Length];
+            for(int i = 0; i < input.Length; i++)
+            {
+                for (int j = 0; j < input[i].Length; j++)
+                {
+                    maze[i, j] = input[i][j];
+                }
+            }            
+            Console.BufferWidth = 400;
+            maze = DoubleTheField(maze);
             (int y, int x) startingCoordinates = FindStartingPosition(maze);
             FindStartingDirections(startingCoordinates, maze, out Direction firstDirection, out Direction secondDirection);
-            Console.WriteLine(firstDirection + " " + secondDirection);
             LoopExplorer Loopin = new LoopExplorer(firstDirection, startingCoordinates);
             LoopExplorer Loopus = new LoopExplorer(secondDirection, startingCoordinates);
             LoopExplorer[] Loopers = new LoopExplorer[] { Loopin, Loopus };
             Loopin.Move(Loopin.GetSetDirection);
             Loopus.Move(Loopus.GetSetDirection);
-            
-            while (!(Loopin.GetCoordinates.y == Loopus.GetCoordinates.y) && !(Loopin.GetCoordinates.x == Loopus.GetCoordinates.x))
+
+            while (!((Loopin.GetCoordinates.y == Loopus.GetCoordinates.y) && (Loopin.GetCoordinates.x == Loopus.GetCoordinates.x)))
             {
                 foreach (LoopExplorer Looper in Loopers)
                 {
-                    Console.WriteLine("(" + Looper.GetCoordinates.y + ", " + Looper.GetCoordinates.x + ")");
                     SetNewDirection(Looper, maze);
+                    maze[Looper.GetCoordinates.y, Looper.GetCoordinates.x] = '3';
+
                     Looper.Move(Looper.GetSetDirection);
+
                 }
             }
-            Console.WriteLine(Loopin.GetCounter);
-        }
+            maze = ReplaceEdgeChars(maze);
+            for (int i = 0; i < 200; i++)
+            {
+                ReplaceAllNonEnclosedChars(maze);
+            }
+            for (int i = 0; i < maze.GetLength(0); i++)
+            {
+                for (int j = 0; j < maze.GetLength(1); j++)
+                {
+                    Console.Write(maze[i, j]);
+                }
+                Console.Write('\n');
+            }
 
-        public (int y, int x) FindStartingPosition(string[] maze)
+            Console.WriteLine(Loopin.GetCounter / 2);
+            int counter = 0;
+            for(int i = 0; i < maze.GetLength(0); i++)
+            {
+                for (int j = 0; j < maze.GetLength(1); j++)
+                {
+
+                    if (maze[i, j] == 'L' || maze[i, j] == '-' || maze[i, j] == 'J' || maze[i, j] == 'F' || maze[i, j] == '7' || maze[i, j] == '|')
+                    {
+                        counter++;
+                    }
+                }
+            }
+            Console.WriteLine(counter);
+        }
+        public char[,] DoubleTheField(char[,] maze)
+        {
+            List<List<char>> maze_list = new List<List<char>>();
+            List<char> mazeRows = new List<char>();
+            List<char> extraRow = new List<char>();
+            for(int i = 0; i < maze.GetLength(0); i++)
+            {
+                for(int j = 0; j < maze.GetLength(1); j++)
+                {
+                    mazeRows.Add(maze[i, j]);
+                    mazeRows.Add('*');
+                }
+                maze_list.Add(mazeRows);
+                foreach(char c in mazeRows)
+                {
+                    extraRow.Add('*');
+                }
+                maze_list.Add(extraRow);
+                mazeRows = new List<char>();
+            }
+            char[,] doubledMaze = new char[maze.GetLength(0) * 2, maze.GetLength(1) * 2];
+            {
+                for (int i = 0; i < doubledMaze.GetLength(0); i++)
+                {
+                    for (int j = 0; j < doubledMaze.GetLength(1); j++)
+                    {
+                        doubledMaze[i, j] = maze_list[i][j];
+                    }
+                }
+            }
+            return doubledMaze;
+        }
+        public char[,] ReplaceAllNonEnclosedChars(char[,] maze)
+        {
+            for(int i = 0; i < maze.GetLength(0);i++)
+            {
+                for(int j = 0; j < maze.GetLength(1); j++)
+                {
+                    if (maze[i, j] != '2' && maze[i, j] != '3')
+                    {
+                        if ((i - 1 >= 0 && maze[i - 1, j] == '2') ||
+                            (i + 1 < maze.GetLength(0) && maze[i + 1, j] == '2') ||
+                            (j - 1 >= 0 && maze[i, j - 1] == '2') ||
+                            (j + 1 < maze.GetLength(1) && maze[i, j + 1] == '2'))
+                        {
+                            maze[i, j] = '2';
+                        }
+                    }
+                }
+            }
+            return maze;
+        }
+        public char[,] ReplaceEdgeChars(char[,] input)
+        {
+            for(int i = 0; i < input.GetLength(1); i++)
+            {
+                if (input[0 , i] != '3')
+                {
+                    input[0, i] = '2';
+                }
+                if (input[input.GetLength(0) - 1 ,i] != '3')
+                {
+                    input[input.GetLength(0) - 1, i] = '2';
+
+                }
+            }
+            for (int i = 0; i < input.GetLength(0); i++)
+            {
+                if (input[i, 0] != '3')
+                {
+                    input[i, 0] = '2';
+
+                }
+                if (input[i, input.GetLength(1) - 1] != '3')
+                {
+                    input[i, input.GetLength(1) - 1] = '2';
+
+                }
+            }
+            return input;
+        }
+        public (int y, int x) FindStartingPosition(char[,] maze)
         {
             (int y, int x) startingPositionCoordinates = (0, 0);
-            for(int i = 0; i < maze.Length; i++)
+            for(int i = 0; i < maze.GetLength(0); i++)
             {
-                for(int j = 0; j < maze[i].Length; j++)
+                for(int j = 0; j < maze.GetLength(1); j++)
                 {
-                    if (maze[i][j] == 'S')
+                    if (maze[i, j] == 'S')
                     {
-                        startingPositionCoordinates = (i, j);
+                        return startingPositionCoordinates = (i, j);
                     }
                 }
             }
             return startingPositionCoordinates;
         }
-        public void FindStartingDirections((int x, int y) startingCoordinates, string[] maze, out Direction firstDirection, out Direction secondDirection)
+        public void FindStartingDirections((int y, int x) startingCoordinates, char[,] maze, out Direction firstDirection, out Direction secondDirection)
         {
             List<Direction> ValidStartingDirections = new List<Direction>();
             for(int i = 0; i < 4; i++)
@@ -108,7 +229,7 @@ namespace AdventOfCode_2023
             firstDirection = ValidStartingDirections[0];
             secondDirection = ValidStartingDirections[1];
         }
-        public bool CanMoveinThisDirection(string[] maze, (int y, int x) coordinates, Direction direction)
+        public bool CanMoveinThisDirection(char[,] maze, (int y, int x) coordinates, Direction direction)
         {
             List<char> canMoveNorthTo = new List<char>() { '7', '|', 'F'};
             List<char> canMoveEastTo = new List<char>() { '7', '-', 'J' };
@@ -117,25 +238,29 @@ namespace AdventOfCode_2023
             switch (direction)
             {
                 case Direction.north:
-                    if (canMoveNorthTo.Contains((maze[coordinates.y - 1][coordinates.x])) && coordinates.y - 1 >= 0) return true;
+                    if (coordinates.y - 2 < 0) return false;
+                    if (canMoveNorthTo.Contains((maze[coordinates.y - 2, coordinates.x]))) return true;
                     return false;
                 case Direction.east:
-                    if (canMoveEastTo.Contains((maze[coordinates.y][coordinates.x + 1])) && coordinates.x + 1 < maze[coordinates.y].Length) return true;
+                    if (coordinates.x + 2 >= maze.GetLength(1)) return false;
+                    if (canMoveEastTo.Contains((maze[coordinates.y, coordinates.x + 2]))) return true;
                     return false;
-                case Direction.south:   
-                    if (canMoveSouthTo.Contains((maze[coordinates.y + 1][coordinates.x])) && coordinates.y + 1 < maze.Length) return true;
+                case Direction.south:
+                    if (coordinates.y + 2 >= maze.GetLength(1)) return false;
+                    if (canMoveSouthTo.Contains((maze[coordinates.y + 2, coordinates.x]))) return true;
                     return false;
                 case Direction.west:
-                    if (canMoveWestTo.Contains((maze[coordinates.y][coordinates.x - 1])) && coordinates.x - 1 >= 0) return true;
+                    if (coordinates.x - 2 < 0) return false;
+                    if (canMoveWestTo.Contains((maze[coordinates.y, coordinates.x - 2]))) return true;
                     return false;
             }
             return false;
         }
-        public void SetNewDirection(LoopExplorer Looper, string[] maze)
+        public void SetNewDirection(LoopExplorer Looper, char[,] maze)
         {
             Direction currentDirection = Looper.GetSetDirection;
 
-            switch (maze[Looper.GetCoordinates.y][Looper.GetCoordinates.x])
+            switch (maze[Looper.GetCoordinates.y, Looper.GetCoordinates.x])
             {
                 case '7':
                     if (currentDirection == Direction.east) Looper.GetSetDirection = Direction.south;
@@ -146,11 +271,11 @@ namespace AdventOfCode_2023
                     else if (currentDirection == Direction.north) Looper.GetSetDirection= Direction.east;
                     break;
                 case 'J':
-                    if (currentDirection == Direction.west) Looper.GetSetDirection = Direction.north;
+                    if (currentDirection == Direction.east) Looper.GetSetDirection = Direction.north;
                     else if (currentDirection == Direction.south) Looper.GetSetDirection = Direction.west;
                     break;
                 case 'L':
-                    if (currentDirection == Direction.east) Looper.GetSetDirection = Direction.north;
+                    if (currentDirection == Direction.west) Looper.GetSetDirection = Direction.north;
                     else if (currentDirection == Direction.south) Looper.GetSetDirection = Direction.east;
                     break;
             }
