@@ -70,11 +70,13 @@ namespace AdventOfCode_2023
                 }
             }            
             Console.BufferWidth = 400;
+            
             maze = DoubleTheField(maze);
             (int y, int x) startingCoordinates = FindStartingPosition(maze);
             FindStartingDirections(startingCoordinates, maze, out Direction firstDirection, out Direction secondDirection);
             LoopExplorer Loopin = new LoopExplorer(firstDirection, startingCoordinates);
             LoopExplorer Loopus = new LoopExplorer(secondDirection, startingCoordinates);
+            maze[Loopin.GetCoordinates.y, Loopin.GetCoordinates.x] = '3';
             LoopExplorer[] Loopers = new LoopExplorer[] { Loopin, Loopus };
             Loopin.Move(Loopin.GetSetDirection);
             Loopus.Move(Loopus.GetSetDirection);
@@ -90,6 +92,7 @@ namespace AdventOfCode_2023
 
                 }
             }
+            maze[Loopin.GetCoordinates.y, Loopin.GetCoordinates.x] = '3';
             maze = ReplaceEdgeChars(maze);
             for (int i = 0; i < 200; i++)
             {
@@ -111,7 +114,7 @@ namespace AdventOfCode_2023
                 for (int j = 0; j < maze.GetLength(1); j++)
                 {
 
-                    if (maze[i, j] == 'L' || maze[i, j] == '-' || maze[i, j] == 'J' || maze[i, j] == 'F' || maze[i, j] == '7' || maze[i, j] == '|')
+                    if (maze[i, j] == 'L' || maze[i, j] == '-' || maze[i, j] == 'J' || maze[i, j] == 'F' || maze[i, j] == '7' || maze[i, j] == '|' || maze[i, j] == '.')
                     {
                         counter++;
                     }

@@ -45,10 +45,11 @@ namespace AdventOfCode
             //Day8 day8 = new Day8();
             //day8.Day8Solutions();
 
-            //Console.WriteLine("\n Day 9 Solutions:");
+            //Console.WriteLine("\nDay 9 Solutions:");
             //Day9 day9 = new Day9();
             //day9.Day9Solution();
 
+            Console.WriteLine("\nDay 10 SOlutions:");
             Day10 day10 = new Day10();
             day10.Day10Solution();
         }
