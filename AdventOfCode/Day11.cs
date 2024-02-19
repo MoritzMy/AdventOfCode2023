@@ -15,15 +15,17 @@ namespace AdventOfCode_2023
         static int counter = 1;
         State state;
         int count;
+        (int y, int x) coordiantes;
         public Galaxies()
         {
             this.state = State.Empty;
             this.count = 0;
         }
-        public Galaxies(State state)
+        public Galaxies(State state, (int y, int x) coordiantes)
         {
             this.state = state;
             this.count = counter++;
+            this.coordiantes = coordiantes;
         }
         public State GetSetState { get { return this.state; } set { this.state = value; } }
         public int GetCount { get { return this.count; } }
@@ -43,7 +45,7 @@ namespace AdventOfCode_2023
                 {
                     if (input[i][j] == '#')
                     {
-                        Galaxies galaxy = new Galaxies(State.Galaxy);
+                        Galaxies galaxy = new Galaxies(State.Galaxy, (i, j));
                         currentRow.Add(galaxy);
                     }
                     else if (input[i][j] == '.')
@@ -72,6 +74,7 @@ namespace AdventOfCode_2023
             }
 
         }
+
         public void ExpandSpace(List<List<Galaxies>> universe)
         {
             for(int i = 0; i < universe.Count; i++)
