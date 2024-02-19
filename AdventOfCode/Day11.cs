@@ -15,13 +15,17 @@ namespace AdventOfCode_2023
         static int counter = 1;
         State state;
         int count;
+        bool expandedVertically;
+        bool expandedHorizontally;
         (int y, int x) coordiantes;
         public Galaxies()
         {
             this.state = State.Empty;
             this.count = 0;
+            this.expandedVertically = false;
+            this.expandedHorizontally = false;
         }
-        public Galaxies(State state, (int y, int x) coordiantes)
+        public Galaxies(State state)
         {
             this.state = state;
             this.count = counter++;
@@ -29,6 +33,9 @@ namespace AdventOfCode_2023
         }
         public State GetSetState { get { return this.state; } set { this.state = value; } }
         public int GetCount { get { return this.count; } }
+        public (int y, int x) GetSetCoordinates { get { return this.coordiantes; } set { this.coordiantes = value; } }
+        public bool GetSetVerticalExpansion {  get { return this.expandedVertically; } set { this.expandedVertically = value; } }
+        public bool GetSetHorizontalExpansion { get { return this.expandedHorizontally; } set { this.expandedHorizontally = value; } }
     }
     internal class Day11
     {
@@ -45,7 +52,7 @@ namespace AdventOfCode_2023
                 {
                     if (input[i][j] == '#')
                     {
-                        Galaxies galaxy = new Galaxies(State.Galaxy, (i, j));
+                        Galaxies galaxy = new Galaxies(State.Galaxy);
                         currentRow.Add(galaxy);
                     }
                     else if (input[i][j] == '.')
@@ -57,30 +64,74 @@ namespace AdventOfCode_2023
                 universe.Add(currentRow);
             }
             ExpandSpace(universe);
-            foreach(List<Galaxies> space in universe)
-            {
-                foreach(Galaxies g in  space)
-                {
-                    if (g.GetSetState == State.Galaxy)
-                    {
-                        Console.Write('#');
-                    }
-                    else if (g.GetSetState == State.Empty)
-                    {
-                        Console.Write('.');
-                    }                  
-                }
-                Console.WriteLine();
-            }
+            SetCoordinatesInUniverse(universe);
+            
+            int expansionAmount = 2;
+            Console.WriteLine(CalculateSumOfMinimalDistances(universe, expansionAmount));
+            expansionAmount = 1000000;
+            Console.WriteLine(CalculateSumOfMinimalDistances(universe, expansionAmount));
 
         }
+        public long CalculateSumOfMinimalDistances(List<List<Galaxies>> universe, int expansionAmount)
+        {
+            long sum = 0;
+            List<Galaxies> allGalaxies = new List<Galaxies> ();
+            foreach (List<Galaxies> universeRow in universe)
+            {
+                foreach (Galaxies Galaxy in universeRow)
+                {
+                    if (Galaxy.GetCount != 0)
+                    {
+                        allGalaxies.Add(Galaxy);
+                    }
+                }
+            }
+            for (int i = 0; i < allGalaxies.Count; i++)
+            {
+                for (int j = i + 1;  j < allGalaxies.Count; j++)
+                {
+                    int verticalExpansionCounter = 0;
+                    int horizontalExpansionCounter = 0;
+                    Galaxies mostLeftGalaxie = allGalaxies[i];
+                    Galaxies mostRightGalaxie = allGalaxies[j];
+                    if (allGalaxies[j].GetSetCoordinates.x < allGalaxies[i].GetSetCoordinates.x)
+                    {
+                        mostLeftGalaxie = allGalaxies[j];
+                        mostRightGalaxie = allGalaxies[i];
+                    }
+                    for(int y = allGalaxies[i].GetSetCoordinates.y; y < allGalaxies[j].GetSetCoordinates.y; y++)
+                    {
+                        if (universe[y][0].GetSetHorizontalExpansion == true) { horizontalExpansionCounter++; }
+                    }
+                    for (int x = mostLeftGalaxie.GetSetCoordinates.x; x < mostRightGalaxie.GetSetCoordinates.x; x++)
+                    {
+                        if (universe[0][x].GetSetVerticalExpansion == true) {  verticalExpansionCounter++; }
+                    }
 
+                    sum += Math.Abs(allGalaxies[j].GetSetCoordinates.x - allGalaxies[i].GetSetCoordinates.x) + (expansionAmount * verticalExpansionCounter - verticalExpansionCounter) + Math.Abs(allGalaxies[j].GetSetCoordinates.y - allGalaxies[i].GetSetCoordinates.y) + (expansionAmount * horizontalExpansionCounter - horizontalExpansionCounter);
+                }
+            }
+            return sum;
+        }
+        public void SetCoordinatesInUniverse(List<List<Galaxies>> universe)
+        {
+            for (int i = 0; i <  universe.Count; i++)
+            {
+                for (int j = 0; j < universe[0].Count; j++)
+                {
+                    if (universe[i][j].GetSetState == State.Galaxy)
+                    {
+                        universe[i][j].GetSetCoordinates = (i, j);
+                    }
+                }
+            }
+        }
         public void ExpandSpace(List<List<Galaxies>> universe)
         {
-            for(int i = 0; i < universe.Count; i++)
+            for (int i = 0; i < universe.Count; i++)
             {
                 bool emptyRow = true;
-                for(int j = 0; j < universe[0].Count; j++)
+                for (int j = 0; j < universe[0].Count; j++)
                 {
                     if (universe[i][j].GetSetState == State.Galaxy)
                     {
@@ -89,13 +140,10 @@ namespace AdventOfCode_2023
                 }
                 if (emptyRow)
                 {
-                    List<Galaxies> newRow = new List<Galaxies>();
-                    foreach(Galaxies galaxy in universe[i])
+                    foreach (Galaxies g in universe[i])
                     {
-                        newRow.Add(galaxy);
+                        g.GetSetHorizontalExpansion = true;
                     }
-                    universe.Insert(i, newRow);
-                    i++;
                 }
             }
             for (int i = 0; i < universe[0].Count; i++)
@@ -110,14 +158,56 @@ namespace AdventOfCode_2023
                 }
                 if (emptyColumn)
                 {
-                    for( int j = 0;j < universe.Count; j++)
+                    for (int j = 0; j < universe.Count; j++)
                     {
-                        universe[j].Insert(i, universe[j][i]);
-
+                        universe[j][i].GetSetVerticalExpansion = true;
                     }
-                    i++;
                 }
             }
         }
+        //public void ExpandSpace(List<List<Galaxies>> universe)
+        //{
+        //    for(int i = 0; i < universe.Count; i++)
+        //    {
+        //        bool emptyRow = true;
+        //        for(int j = 0; j < universe[0].Count; j++)
+        //        {
+        //            if (universe[i][j].GetSetState == State.Galaxy)
+        //            {
+        //                emptyRow = false;
+        //            }
+        //        }
+        //        if (emptyRow)
+        //        {
+        //            List<Galaxies> newRow = new List<Galaxies>();
+        //            foreach(Galaxies galaxy in universe[i])
+        //            {
+        //                newRow.Add(galaxy);
+        //            }
+        //            universe.Insert(i, newRow);
+        //            i++;
+        //        }
+        //    }
+        //    for (int i = 0; i < universe[0].Count; i++)
+        //    {
+        //        bool emptyColumn = true;
+        //        for (int j = 0; j < universe.Count; j++)
+        //        {
+        //            if (universe[j][i].GetSetState == State.Galaxy)
+        //            {
+        //                emptyColumn = false;
+        //            }
+        //        }
+        //        if (emptyColumn)
+        //        {
+        //            for( int j = 0;j < universe.Count; j++)
+        //            {
+        //                universe[j].Insert(i, universe[j][i]);
+
+        //            }
+        //            i++;
+        //        }
+        //    }
+        //}
     }
 }
