@@ -49,13 +49,13 @@ namespace AdventOfCode
             //Day9 day9 = new Day9();
             //day9.Day9Solution();
 
-            //Console.WriteLine("\nDay 10 Solutions:");
-            //Day10 day10 = new Day10();
-            //day10.Day10Solution();
+            Console.WriteLine("\nDay 10 Solutions:");
+            Day10 day10 = new Day10();
+            day10.Day10Solution();
 
-            Console.WriteLine("\nDay 11 Solutions:");
-            Day11 day11 = new Day11();
-            day11.Day11Solutions();
+            //Console.WriteLine("\nDay 11 Solutions:");
+            //Day11 day11 = new Day11();
+            //day11.Day11Solutions();
         }
 
 

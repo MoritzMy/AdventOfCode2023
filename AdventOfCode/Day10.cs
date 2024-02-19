@@ -76,7 +76,7 @@ namespace AdventOfCode_2023
             FindStartingDirections(startingCoordinates, maze, out Direction firstDirection, out Direction secondDirection);
             LoopExplorer Loopin = new LoopExplorer(firstDirection, startingCoordinates);
             LoopExplorer Loopus = new LoopExplorer(secondDirection, startingCoordinates);
-            maze[Loopin.GetCoordinates.y, Loopin.GetCoordinates.x] = '3';
+            maze[Loopin.GetCoordinates.y, Loopin.GetCoordinates.x] = '1';
             LoopExplorer[] Loopers = new LoopExplorer[] { Loopin, Loopus };
             Loopin.Move(Loopin.GetSetDirection);
             Loopus.Move(Loopus.GetSetDirection);
@@ -86,13 +86,13 @@ namespace AdventOfCode_2023
                 foreach (LoopExplorer Looper in Loopers)
                 {
                     SetNewDirection(Looper, maze);
-                    maze[Looper.GetCoordinates.y, Looper.GetCoordinates.x] = '3';
+                    maze[Looper.GetCoordinates.y, Looper.GetCoordinates.x] = '1';
 
                     Looper.Move(Looper.GetSetDirection);
 
                 }
             }
-            maze[Loopin.GetCoordinates.y, Loopin.GetCoordinates.x] = '3';
+            maze[Loopin.GetCoordinates.y, Loopin.GetCoordinates.x] = '1';
             maze = ReplaceEdgeChars(maze);
             for (int i = 0; i < 200; i++)
             {
@@ -102,6 +102,9 @@ namespace AdventOfCode_2023
             {
                 for (int j = 0; j < maze.GetLength(1); j++)
                 {
+                    if (maze[i, j] == '1') Console.ForegroundColor = ConsoleColor.Red;
+                    else if (maze[i, j] == '0') Console.ForegroundColor = ConsoleColor.Blue;
+                    else { Console.ForegroundColor = ConsoleColor.Green; }
                     Console.Write(maze[i, j]);
                 }
                 Console.Write('\n');
@@ -160,14 +163,14 @@ namespace AdventOfCode_2023
             {
                 for(int j = 0; j < maze.GetLength(1); j++)
                 {
-                    if (maze[i, j] != '2' && maze[i, j] != '3')
+                    if (maze[i, j] != '0' && maze[i, j] != '1')
                     {
-                        if ((i - 1 >= 0 && maze[i - 1, j] == '2') ||
-                            (i + 1 < maze.GetLength(0) && maze[i + 1, j] == '2') ||
-                            (j - 1 >= 0 && maze[i, j - 1] == '2') ||
-                            (j + 1 < maze.GetLength(1) && maze[i, j + 1] == '2'))
+                        if ((i - 1 >= 0 && maze[i - 1, j] == '0') ||
+                            (i + 1 < maze.GetLength(0) && maze[i + 1, j] == '0') ||
+                            (j - 1 >= 0 && maze[i, j - 1] == '0') ||
+                            (j + 1 < maze.GetLength(1) && maze[i, j + 1] == '0'))
                         {
-                            maze[i, j] = '2';
+                            maze[i, j] = '0';
                         }
                     }
                 }
@@ -178,26 +181,26 @@ namespace AdventOfCode_2023
         {
             for(int i = 0; i < input.GetLength(1); i++)
             {
-                if (input[0 , i] != '3')
+                if (input[0 , i] != '1')
                 {
-                    input[0, i] = '2';
+                    input[0, i] = '0';
                 }
-                if (input[input.GetLength(0) - 1 ,i] != '3')
+                if (input[input.GetLength(0) - 1 ,i] != '1')
                 {
-                    input[input.GetLength(0) - 1, i] = '2';
+                    input[input.GetLength(0) - 1, i] = '0';
 
                 }
             }
             for (int i = 0; i < input.GetLength(0); i++)
             {
-                if (input[i, 0] != '3')
+                if (input[i, 0] != '1')
                 {
-                    input[i, 0] = '2';
+                    input[i, 0] = '0';
 
                 }
-                if (input[i, input.GetLength(1) - 1] != '3')
+                if (input[i, input.GetLength(1) - 1] != '1')
                 {
-                    input[i, input.GetLength(1) - 1] = '2';
+                    input[i, input.GetLength(1) - 1] = '0';
 
                 }
             }
